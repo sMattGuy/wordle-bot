@@ -47,9 +47,8 @@ client.on('interactionCreate', async interaction => {
 });
 
 client.on('messageCreate', async message => {
-	console.log('message recieved');
 	const regex = new RegExp('Wordle ([1-9][0-9]?[0-9]?) ([1-6]|X)\/6');
-	if(message.author.id == '492850107038040095' && message.content == '!wordleUpdate'){
+	if(message.author.id == message.guild.ownerId && message.content == '!wordleUpdate'){
 		//admin trigger for updating database
 		console.log('fetching all messages');
 		const messages = await fetchAllMessages(message.channel);
@@ -58,6 +57,7 @@ client.on('messageCreate', async message => {
 				//valid wordle message
 				console.log('found valid message');
 				await insertWordleData(messages[i].content, messages[i].author.id);
+				messages[i].react('✅');
 			}
 			else{
 				//message not valid
@@ -69,6 +69,7 @@ client.on('messageCreate', async message => {
 	else if(regex.test(message.content)){
 		//process wordle string into database
 		insertWordleData(message.content, message.author.id);
+		message.react('✅');
 	}
 	else{
 		//do nothing if either isnt true
