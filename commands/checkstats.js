@@ -19,7 +19,7 @@ module.exports = {
 		}
 		const tag = await Tags.findAll({where:{uid: uid}});
 		
-		if(tag){
+		if(tag.length != 0){
 			//if puzzles are found
 			let scoreList = [0,0,0,0,0,0,0];
 			for(let i=0;i<tag.length;i++){

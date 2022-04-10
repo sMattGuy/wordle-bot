@@ -20,7 +20,6 @@ const Tags = sequelize.define('tags', {
 	desc: Sequelize.TEXT
 })
 
-
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
@@ -73,7 +72,6 @@ client.on('messageCreate', async message => {
 	}
 	else{
 		//do nothing if either isnt true
-		console.log('not entering data');
 	}
 });
 
@@ -121,7 +119,6 @@ async function fetchAllMessages(channelId) {
 			message = 0 < messagePage.size ? messagePage.at(messagePage.size - 1) : null;
 		});
 	}
-
 	return messages
 }
 

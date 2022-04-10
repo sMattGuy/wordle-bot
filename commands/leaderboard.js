@@ -30,6 +30,10 @@ module.exports = {
 			tag = await Tags.findAll({attributes:['uid','score']});
 		}
 		
+		if(tag.length == 0){
+			return interaction.editReply('There is no data for that puzzle!');
+		}
+		
 		if(boardType == 'score')
 			ScoreLeaderboard();
 		else if(boardType == 'average')
@@ -42,106 +46,100 @@ module.exports = {
 		
 		async function ScoreLeaderboard(){
 			const leaderboardMap = new Map();
-			if(tag){
-				//if puzzles are found
-				for(let i=0;i<tag.length;i++){
-					let scoreValue = 0;
-					scoreValue = parseInt(tag[i].score);
-					if(isNaN(scoreValue)){
-						scoreValue = 7;
-					}
-					scoreValue = 7 - scoreValue;
-					let newTotal = leaderboardMap.get(tag[i].uid) + scoreValue;
-					if(isNaN(newTotal)){
-						newTotal = scoreValue;
-					}
-					leaderboardMap.set(tag[i].uid,newTotal);
+			//if puzzles are found
+			for(let i=0;i<tag.length;i++){
+				let scoreValue = 0;
+				scoreValue = parseInt(tag[i].score);
+				if(isNaN(scoreValue)){
+					scoreValue = 7;
 				}
-				const sortedBoard = new Map([...leaderboardMap.entries()].sort((a,b)=>b[1]-a[1]));
-				let leaderboardMessage = '';
-				let position = 1;
-				for(let [key, value] of sortedBoard){
-					try{
-						const username = await interaction.guild.members.fetch(key).then(userf => {return userf.displayName});
-						leaderboardMessage += `(${position}). ${username}: Total Score: ${value}\n`;
-						position++;
-					} catch(error){
-						//user not in server
-					}
+				scoreValue = 7 - scoreValue;
+				let newTotal = leaderboardMap.get(tag[i].uid) + scoreValue;
+				if(isNaN(newTotal)){
+					newTotal = scoreValue;
 				}
-				interaction.editReply({content:Formatters.codeBlock(`${leaderboardMessage}`),ephemeral:true});
+				leaderboardMap.set(tag[i].uid,newTotal);
 			}
+			const sortedBoard = new Map([...leaderboardMap.entries()].sort((a,b)=>b[1]-a[1]));
+			let leaderboardMessage = '';
+			let position = 1;
+			for(let [key, value] of sortedBoard){
+				try{
+					const username = await interaction.guild.members.fetch(key).then(userf => {return userf.displayName});
+					leaderboardMessage += `(${position}). ${username}: Total Score: ${value}\n`;
+					position++;
+				} catch(error){
+					//user not in server
+				}
+			}
+			interaction.editReply({content:Formatters.codeBlock(`${leaderboardMessage}`),ephemeral:true});
 		}
 		
 		async function AverageLeaderboard(){
 			const leaderboardMap = new Map();
 			const leaderboardCounter = new Map();
-			if(tag){
-				//if puzzles are found
-				for(let i=0;i<tag.length;i++){
-					let scoreValue = 0;
-					scoreValue = parseInt(tag[i].score);
-					if(isNaN(scoreValue)){
-						scoreValue = 7;
-					}
-					let newTotal = leaderboardMap.get(tag[i].uid) + scoreValue;
-					if(isNaN(newTotal)){
-						newTotal = scoreValue;
-					}
-					leaderboardMap.set(tag[i].uid,newTotal);
-					let avgCounter = leaderboardCounter.get(tag[i].uid) + 1;
-					if(isNaN(avgCounter)){
-						avgCounter = 1;
-					}
-					leaderboardCounter.set(tag[i].uid, avgCounter);
+			//if puzzles are found
+			for(let i=0;i<tag.length;i++){
+				let scoreValue = 0;
+				scoreValue = parseInt(tag[i].score);
+				if(isNaN(scoreValue)){
+					scoreValue = 7;
 				}
-				for(let [key, value] of leaderboardMap){
-					let scoreCount = leaderboardCounter.get(key);
-					let average = value / scoreCount
-					average = average.toFixed(2);
-					leaderboardMap.set(key,average);
+				let newTotal = leaderboardMap.get(tag[i].uid) + scoreValue;
+				if(isNaN(newTotal)){
+					newTotal = scoreValue;
 				}
-				const sortedBoard = new Map([...leaderboardMap.entries()].sort((a,b)=>a[1]-b[1]));
-				let leaderboardMessage = '';
-				let position = 1;
-				for(let [key, value] of sortedBoard){
-					try{
-						const username = await interaction.guild.members.fetch(key).then(userf => {return userf.displayName});
-						leaderboardMessage += `(${position}). ${username}: Average: ${value}\n`;
-						position++;
-					} catch(error){
-						//user not in server
-					}
+				leaderboardMap.set(tag[i].uid,newTotal);
+				let avgCounter = leaderboardCounter.get(tag[i].uid) + 1;
+				if(isNaN(avgCounter)){
+					avgCounter = 1;
 				}
-				interaction.editReply({content:Formatters.codeBlock(`${leaderboardMessage}`),ephemeral:true});
+				leaderboardCounter.set(tag[i].uid, avgCounter);
 			}
+			for(let [key, value] of leaderboardMap){
+				let scoreCount = leaderboardCounter.get(key);
+				let average = value / scoreCount
+				average = average.toFixed(2);
+				leaderboardMap.set(key,average);
+			}
+			const sortedBoard = new Map([...leaderboardMap.entries()].sort((a,b)=>a[1]-b[1]));
+			let leaderboardMessage = '';
+			let position = 1;
+			for(let [key, value] of sortedBoard){
+				try{
+					const username = await interaction.guild.members.fetch(key).then(userf => {return userf.displayName});
+					leaderboardMessage += `(${position}). ${username}: Average: ${value}\n`;
+					position++;
+				} catch(error){
+					//user not in server
+				}
+			}
+			interaction.editReply({content:Formatters.codeBlock(`${leaderboardMessage}`),ephemeral:true});
 		}
 		
 		async function PuzzleLeaderboard(){
 			const leaderboardMap = new Map();
-			if(tag){
-				//if puzzles are found
-				for(let i=0;i<tag.length;i++){
-					let newTotal = leaderboardMap.get(tag[i].uid) + 1;
-					if(isNaN(newTotal)){
-						newTotal = 1;
-					}
-					leaderboardMap.set(tag[i].uid,newTotal);
+			//if puzzles are found
+			for(let i=0;i<tag.length;i++){
+				let newTotal = leaderboardMap.get(tag[i].uid) + 1;
+				if(isNaN(newTotal)){
+					newTotal = 1;
 				}
-				const sortedBoard = new Map([...leaderboardMap.entries()].sort((a,b)=>b[1]-a[1]));
-				let leaderboardMessage = '';
-				let position = 1;
-				for(let [key, value] of sortedBoard){
-					try{
-						const username = await interaction.guild.members.fetch(key).then(userf => {return userf.displayName});
-						leaderboardMessage += `(${position}). ${username}: Total Puzzles: ${value}\n`;
-						position++;
-					} catch(error){
-						//user not in server
-					}
-				}
-				interaction.editReply({content:Formatters.codeBlock(`${leaderboardMessage}`),ephemeral:true});
+				leaderboardMap.set(tag[i].uid,newTotal);
 			}
+			const sortedBoard = new Map([...leaderboardMap.entries()].sort((a,b)=>b[1]-a[1]));
+			let leaderboardMessage = '';
+			let position = 1;
+			for(let [key, value] of sortedBoard){
+				try{
+					const username = await interaction.guild.members.fetch(key).then(userf => {return userf.displayName});
+					leaderboardMessage += `(${position}). ${username}: Total Puzzles: ${value}\n`;
+					position++;
+				} catch(error){
+					//user not in server
+				}
+			}
+			interaction.editReply({content:Formatters.codeBlock(`${leaderboardMessage}`),ephemeral:true});
 		}
 	},
 };
