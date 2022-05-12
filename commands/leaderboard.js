@@ -61,18 +61,7 @@ module.exports = {
 				leaderboardMap.set(tag[i].uid,newTotal);
 			}
 			const sortedBoard = new Map([...leaderboardMap.entries()].sort((a,b)=>b[1]-a[1]));
-			let leaderboardMessage = '';
-			let position = 1;
-			for(let [key, value] of sortedBoard){
-				try{
-					const username = await interaction.guild.members.fetch(key).then(userf => {return userf.displayName});
-					leaderboardMessage += `(${position}). ${username}: Total Score: ${value}\n`;
-					position++;
-				} catch(error){
-					//user not in server
-				}
-			}
-			interaction.editReply({content:Formatters.codeBlock(`${leaderboardMessage}`),ephemeral:true});
+			sendBoard(sortedBoard, "Total Score");
 		}
 		
 		async function AverageLeaderboard(){
@@ -103,18 +92,7 @@ module.exports = {
 				leaderboardMap.set(key,average);
 			}
 			const sortedBoard = new Map([...leaderboardMap.entries()].sort((a,b)=>a[1]-b[1]));
-			let leaderboardMessage = '';
-			let position = 1;
-			for(let [key, value] of sortedBoard){
-				try{
-					const username = await interaction.guild.members.fetch(key).then(userf => {return userf.displayName});
-					leaderboardMessage += `(${position}). ${username}: Average: ${value}\n`;
-					position++;
-				} catch(error){
-					//user not in server
-				}
-			}
-			interaction.editReply({content:Formatters.codeBlock(`${leaderboardMessage}`),ephemeral:true});
+			sendBoard(sortedBoard, "Average");
 		}
 		
 		async function PuzzleLeaderboard(){
@@ -128,15 +106,23 @@ module.exports = {
 				leaderboardMap.set(tag[i].uid,newTotal);
 			}
 			const sortedBoard = new Map([...leaderboardMap.entries()].sort((a,b)=>b[1]-a[1]));
+			sendBoard(sortedBoard, "Total Puzzles");
+		}
+		
+		async function sendBoard(sortedBoard, boardName){
 			let leaderboardMessage = '';
 			let position = 1;
 			for(let [key, value] of sortedBoard){
 				try{
 					const username = await interaction.guild.members.fetch(key).then(userf => {return userf.displayName});
-					leaderboardMessage += `(${position}). ${username}: Total Puzzles: ${value}\n`;
+					leaderboardMessage += `(${position}). ${username}: ${boardName}: ${value}\n`;
 					position++;
 				} catch(error){
 					//user not in server
+				}
+				if(position > 10){
+					//exit and send top 10 players
+					break;
 				}
 			}
 			interaction.editReply({content:Formatters.codeBlock(`${leaderboardMessage}`),ephemeral:true});
