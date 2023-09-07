@@ -47,7 +47,7 @@ client.on('interactionCreate', async interaction => {
 });
 
 client.on('messageCreate', async message => {
-	const regex = new RegExp('Wordle (\d+) ([1-6]|X)\/6');
+	const regex = new RegExp('Wordle (\\d+) ([1-6]|X)\/6');
 	if(message.author.id == message.guild.ownerId && message.content == '!wordleUpdate'){
 		//admin trigger for updating database
 		console.log('fetching all messages');
